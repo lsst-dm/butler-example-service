@@ -2,7 +2,9 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from lsst.daf.butler import LabeledButlerFactory
+from safir.dependencies.gafaelfawr import auth_delegated_token_dependency
 from safir.dependencies.logger import logger_dependency
 from safir.metadata import get_metadata
 from structlog.stdlib import BoundLogger
@@ -15,8 +17,6 @@ __all__ = ["get_index", "external_router"]
 external_router = APIRouter()
 """FastAPI router for all external handlers."""
 
-from lsst.daf.butler import LabeledButlerFactory
-from safir.dependencies.gafaelfawr import auth_delegated_token_dependency
 
 _BUTLER_FACTORY = LabeledButlerFactory()
 _BUTLER_REPOSITORY = "dp02"
@@ -32,7 +32,14 @@ def get_coadd_url(
         label=_BUTLER_REPOSITORY, access_token=delegated_token
     )
 
-    return f"http://stub.example/{tract}/{patch}"
+    ref = butler.find_dataset(
+        "deepCoadd",
+        data_id={"tract": tract, "patch": patch, "band": "i", "skymap": "DC2"},
+        collections="2.2i/runs/DP0.2",
+    )
+    if ref is None:
+        raise HTTPException(status_code=404, detail="Coadd not found")
+    return str(butler.getURI(ref))
 
 
 @external_router.get(
