@@ -16,3 +16,4 @@ uvicorn[standard]
 pydantic
 pydantic-settings
 safir>=5
+lsst-daf-butler[remote]
