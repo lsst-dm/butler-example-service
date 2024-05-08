@@ -15,7 +15,11 @@ __all__ = ["get_index", "external_router"]
 external_router = APIRouter()
 """FastAPI router for all external handlers."""
 
+from lsst.daf.butler import LabeledButlerFactory
 from safir.dependencies.gafaelfawr import auth_delegated_token_dependency
+
+_BUTLER_FACTORY = LabeledButlerFactory()
+_BUTLER_REPOSITORY = "dp02"
 
 
 @external_router.get("/coadd_url")
@@ -24,6 +28,10 @@ def get_coadd_url(
     patch: int,
     delegated_token: Annotated[str, Depends(auth_delegated_token_dependency)],
 ) -> str:
+    butler = _BUTLER_FACTORY.create_butler(
+        label=_BUTLER_REPOSITORY, access_token=delegated_token
+    )
+
     return f"http://stub.example/{tract}/{patch}"
 
 
