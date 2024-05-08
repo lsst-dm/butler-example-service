@@ -15,11 +15,14 @@ __all__ = ["get_index", "external_router"]
 external_router = APIRouter()
 """FastAPI router for all external handlers."""
 
+from safir.dependencies.gafaelfawr import auth_delegated_token_dependency
+
 
 @external_router.get("/coadd_url")
 def get_coadd_url(
     tract: int,
     patch: int,
+    delegated_token: Annotated[str, Depends(auth_delegated_token_dependency)],
 ) -> str:
     return f"http://stub.example/{tract}/{patch}"
 
