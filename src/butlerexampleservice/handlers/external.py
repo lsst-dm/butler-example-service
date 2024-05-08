@@ -16,6 +16,14 @@ external_router = APIRouter()
 """FastAPI router for all external handlers."""
 
 
+@external_router.get("/coadd_url")
+def get_coadd_url(
+    tract: int,
+    patch: int,
+) -> str:
+    return f"http://stub.example/{tract}/{patch}"
+
+
 @external_router.get(
     "/",
     description=(
