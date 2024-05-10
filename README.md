@@ -1,6 +1,11 @@
-# butler-example-service
+# Example of a service using Butler client/server
 
-Example of accessing Butler data using a web service
-Learn more at https://butler-example-service.lsst.io
+This is an example of accessing Butler data using a web service.  This was
+presented during the "Butler client-server" talk at the [SQRE services
+bootcamp](https://confluence.lsstcorp.org/display/DM/SQuaRE+Bootcamp+-+May+6-10+2024).
 
-butler-example-service is developed with [FastAPI](https://fastapi.tiangolo.com) and [Safir](https://safir.lsst.io).
+Most of the meat is in the `get_coadd_url()` FastAPI handler in
+`src/butlerexampleservice/handlers/external.py` -- the rest of this is just a
+[Safir](https://safir.lsst.io) template project.
+
+An example for a Phalanx deployment of this service can be found [here](https://github.com/lsst-sqre/phalanx/pull/3303).

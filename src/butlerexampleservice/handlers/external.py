@@ -18,18 +18,28 @@ external_router = APIRouter()
 """FastAPI router for all external handlers."""
 
 
+# The Butler factory loads configuration from the DAF_BUTLER_REPOSITORIES
+# environment variable by default.
+#
+# There should be a single global instance of this factory -- it caches
+# data to allow Butler instances to be created quickly.
 _BUTLER_FACTORY = LabeledButlerFactory()
-_BUTLER_REPOSITORY = "dp02"
 
 
+# This HTTP GET handler returns the URL for a coadded image, given a position
+# in the sky in Rubin's tract/patch skymap.
 @external_router.get("/coadd_url")
 def get_coadd_url(
     tract: int,
     patch: int,
+    # This retrieves a Gafaelfawr access token from headers provided by
+    # GafaelfawrIngress.
     delegated_token: Annotated[str, Depends(auth_delegated_token_dependency)],
 ) -> str:
+    # "dp02" is Data Preview 0.2, currently the only Butler repository
+    # available in the Rubin Science Platform.
     butler = _BUTLER_FACTORY.create_butler(
-        label=_BUTLER_REPOSITORY, access_token=delegated_token
+        label="dp02", access_token=delegated_token
     )
 
     ref = butler.find_dataset(
